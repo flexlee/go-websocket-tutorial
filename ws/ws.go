@@ -9,21 +9,25 @@ import (
 var upgrader websocket.Upgrader
 var hub Hub
 
-func InitWS() {
+func InitWS() *Hub {
 
 	upgrader = websocket.Upgrader{}
 	hub = Hub{
-		broadcast:    make(chan []byte),
+		Broadcast:    make(chan []byte),
 		addClient:    make(chan *Client),
 		removeClient: make(chan *Client),
 		clients:      make(map[*Client]bool),
 	}
+	return &hub
+}
+
+func StartWS() {
 	go hub.start()
 }
 
 type Hub struct {
 	clients      map[*Client]bool
-	broadcast    chan []byte
+	Broadcast    chan []byte
 	addClient    chan *Client
 	removeClient chan *Client
 }
@@ -31,20 +35,20 @@ type Hub struct {
 func (hub *Hub) start() {
 	for {
 		select {
-		case conn := <-hub.addClient:
-			hub.clients[conn] = true
-		case conn := <-hub.removeClient:
-			if _, ok := hub.clients[conn]; ok {
-				delete(hub.clients, conn)
-				close(conn.send)
+		case client := <-hub.addClient:
+			hub.clients[client] = true
+		case client := <-hub.removeClient:
+			if _, ok := hub.clients[client]; ok {
+				delete(hub.clients, client)
+				close(client.send)
 			}
-		case message := <-hub.broadcast:
-			for conn := range hub.clients {
+		case message := <-hub.Broadcast:
+			for client := range hub.clients {
 				select {
-				case conn.send <- message:
+				case client.send <- message:
 				default:
-					close(conn.send)
-					delete(hub.clients, conn)
+					close(client.send)
+					delete(hub.clients, client)
 				}
 			}
 		}
@@ -52,11 +56,14 @@ func (hub *Hub) start() {
 }
 
 type Client struct {
-	ws   *websocket.Conn
+	ws *websocket.Conn
+	// Hub passes Broadcast messages to this channel
 	send chan []byte
 }
 
+// Hub Broadcasts a new message and this fires
 func (c *Client) write() {
+	// make to the close the connection in case the loop exits
 	defer func() {
 		c.ws.Close()
 	}()
@@ -74,6 +81,7 @@ func (c *Client) write() {
 	}
 }
 
+// New message received so pass it to the Hub
 func (c *Client) read() {
 	defer func() {
 		hub.removeClient <- c
@@ -88,7 +96,7 @@ func (c *Client) read() {
 			break
 		}
 
-		hub.broadcast <- message
+		hub.Broadcast <- message
 	}
 }
 
