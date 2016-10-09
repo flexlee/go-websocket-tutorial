@@ -1,4 +1,4 @@
-package main
+package ws
 
 import (
 	"net/http"
@@ -6,20 +6,26 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader websocket.Upgrader
+var hub Hub
+
+func InitWS() {
+
+	upgrader = websocket.Upgrader{}
+	hub = Hub{
+		broadcast:    make(chan []byte),
+		addClient:    make(chan *Client),
+		removeClient: make(chan *Client),
+		clients:      make(map[*Client]bool),
+	}
+	go hub.start()
+}
 
 type Hub struct {
 	clients      map[*Client]bool
 	broadcast    chan []byte
 	addClient    chan *Client
 	removeClient chan *Client
-}
-
-var hub = Hub{
-	broadcast:    make(chan []byte),
-	addClient:    make(chan *Client),
-	removeClient: make(chan *Client),
-	clients:      make(map[*Client]bool),
 }
 
 func (hub *Hub) start() {
@@ -86,7 +92,7 @@ func (c *Client) read() {
 	}
 }
 
-func wsPage(w http.ResponseWriter, req *http.Request) {
+func WsPage(w http.ResponseWriter, req *http.Request) {
 	conn, err := upgrader.Upgrade(w, req, nil)
 
 	if err != nil {
@@ -106,6 +112,6 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 }
 
 // homePage serves the chat box
-func homePage(w http.ResponseWriter, req *http.Request) {
+func HomePage(w http.ResponseWriter, req *http.Request) {
 	http.ServeFile(w, req, "index.html")
 }

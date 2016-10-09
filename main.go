@@ -1,10 +1,15 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/flexlee/go-websocket-tutorial/ws"
+)
 
 func main() {
-	go hub.start()
-	http.HandleFunc("/ws", wsPage)
-	http.HandleFunc("/", homePage)
+	ws.InitWS()
+	// go hub.start()
+	http.HandleFunc("/ws", ws.WsPage)
+	http.HandleFunc("/", ws.HomePage)
 	http.ListenAndServe(":8080", nil)
 }
