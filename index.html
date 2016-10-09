@@ -22,10 +22,20 @@
 			console.log("Socket opened successfully");
 		}
 
+	//	socket.onmessage = function(event) {
+	//		var box = document.createElement("div");
+	//		box.innerHTML = event.data;
+	//		var item = document.getElementById("box")
+	//		// item.appendChild(box);
+	//		item.parentNode.replaceChild(box, item)
+	//	}
 		socket.onmessage = function(event) {
 			var box = document.createElement("div");
+			box.setAttribute("id", "box")
 			box.innerHTML = event.data;
-			document.getElementById("box").appendChild(box);
+			var item = document.getElementById("box")
+			// item.appendChild(box);
+			item.parentNode.replaceChild(box, item)
 		}
 
 		window.onbeforeunload = function(event){

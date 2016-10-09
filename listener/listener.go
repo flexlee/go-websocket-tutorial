@@ -23,7 +23,10 @@ func waitForNotification(hub *ws.Hub, l *pq.Listener) {
 				fmt.Println("Error processing JSON: ", err)
 				return
 			}
-			fmt.Println(string(prettyJSON.Bytes()))
+
+			// Need to slowdown sending msg to channel, would overwhelm websocket
+			time.Sleep(1 * time.Millisecond)
+			// fmt.Println(string(prettyJSON.Bytes()))
 			hub.Broadcast <- prettyJSON.Bytes()
 			return
 		case <-time.After(600 * time.Second):
@@ -36,10 +39,10 @@ func waitForNotification(hub *ws.Hub, l *pq.Listener) {
 	}
 }
 
-func InitDBListener(hub *ws.Hub) {
-	var conninfo string = "host=0.0.0.0 port=32770 dbname=todopy_pg user=keli password=something_super_secret_change_in_production sslmode=disable"
+// InitDBListener initializes DB connection and pass *ws.Hub for sedning notifications
+func InitDBListener(hub *ws.Hub, connInfo string, listenCh string) {
 
-	_, err := sql.Open("postgres", conninfo)
+	_, err := sql.Open("postgres", connInfo)
 	if err != nil {
 		panic(err)
 	}
@@ -50,8 +53,8 @@ func InitDBListener(hub *ws.Hub) {
 		}
 	}
 
-	listener := pq.NewListener(conninfo, 10*time.Second, time.Minute, reportProblem)
-	err = listener.Listen("todos_updates")
+	listener := pq.NewListener(connInfo, 10*time.Second, time.Minute, reportProblem)
+	err = listener.Listen(listenCh)
 	if err != nil {
 		panic(err)
 	}

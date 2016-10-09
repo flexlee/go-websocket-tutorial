@@ -72,7 +72,7 @@ func (c *Client) write() {
 		select {
 		case message, ok := <-c.send:
 			if !ok {
-				c.ws.WriteMessage(websocket.CloseMessage, []byte{})
+				c.ws.WriteMessage(websocket.CloseMessage, []byte("Error writing message, closing WebSocket..."))
 				return
 			}
 
