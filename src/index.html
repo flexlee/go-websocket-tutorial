@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="../../favicon.ico">
+
+	<title>Dashboard Template for Bootstrap</title>
+
+
+
+
+</head>
+<body>
+
+	<div class="container-fluid">
+		<div class="row">
+
+			<div class="col-sm-10 col-md-12 main">
+				<h1 class="page-header">Dashboard</h1>
+
+
+				<h2 class="sub-header">Portfolio</h2>
+				<div class="table-responsive">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th class="col-md-2">Ticker</th>
+								<th class="col-md-2">Quantity</th>
+								<th class="col-md-2">Price</th>
+								<th class="col-md-4">Update Time</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr id="AAPL">
+								<td>APPL</td>
+								<td id="Quantity"></td>
+								<td id="Price"></td>
+								<td id="UpdateTime"></td>
+							</tr>
+							<tr id="GOOG">
+								<td>GOOG</td>
+								<td id="Quantity"></td>
+								<td id="Price"></td>
+								<td id="UpdateTime"></td>
+							</tr>
+							<tr id="AMZN">
+								<td>AMZN</td>
+								<td id="Quantity"></td>
+								<td id="Price"></td>
+								<td id="UpdateTime"></td>
+							</tr>
+							<tr id="FB">
+								<td>FB</td>
+								<td id="Quantity"></td>
+								<td id="Price"></td>
+								<td id="UpdateTime"></td>
+							</tr>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<script>
+		var socket = new WebSocket("ws://localhost:8080/ws");
+
+		// var button = document.getElementById("button");
+		// button.addEventListener("click", function(event){
+		// 	var text = document.getElementById("textbox").value;
+		// 	socket.send(text);
+		// });
+
+		socket.onopen = function(event){
+			console.log("Socket opened successfully");
+		}
+
+	//	socket.onmessage = function(event) {
+	//		var box = document.createElement("div");
+	//		box.innerHTML = event.data;
+	//		var item = document.getElementById("box")
+	//		// item.appendChild(box);
+	//		item.parentNode.replaceChild(box, item)
+	//	}
+		socket.onmessage = function(event) {
+			// var box = document.createElement("div");
+			// box.setAttribute("id", "box");
+			jsonData = JSON.parse(event.data);
+			if (jsonData.ticker == 'GOOG') {
+				// box.innerHTML = jsonData.update_time;
+				// var item = document.getElementById("box");
+				// item.appendChild(box);
+				// item.parentNode.replaceChild(box, item);
+				$('#GOOG #Quantity').html(jsonData.quantity)
+				$('#GOOG #Price').html(jsonData.price)
+				$('#GOOG #UpdateTime').html(jsonData.update_time)
+			} else if (jsonData.ticker == 'AAPL') {
+				$('#AAPL #Quantity').html(jsonData.quantity)
+				$('#AAPL #Price').html(jsonData.price)
+				$('#AAPL #UpdateTime').html(jsonData.update_time)
+			} else if (jsonData.ticker == 'AMZN') {
+				$('#AMZN #Quantity').html(jsonData.quantity)
+				$('#AMZN #Price').html(jsonData.price)
+				$('#AMZN #UpdateTime').html(jsonData.update_time)
+			} else if (jsonData.ticker == 'FB') {
+				$('#FB #Quantity').html(jsonData.quantity)
+				$('#FB #Price').html(jsonData.price)
+				$('#FB #UpdateTime').html(jsonData.update_time)
+			}
+		}
+
+		window.onbeforeunload = function(event){
+			socket.close();
+		}
+	</script>
+</body>
+</html>
