@@ -1,4 +1,4 @@
-# Real-Time Dashboard with websocket and PostgresQL Listen/Notify
+# Real-Time Dashboard with websocket
 
 
 ### Tech Stack
@@ -17,5 +17,5 @@ Deploy with docker-compose
     ./deploy-docker.sh
 
 
-    ### Todos
-    * Testing
+### Todos
+* Testing
