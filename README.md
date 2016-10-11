@@ -24,4 +24,4 @@ Deploy with docker-compose
 
 
 ### Screenshot
-![alt tag](websocket-dashboard/Dashboard.jpg)
+![alt tag](https://github.com/flexlee/websocket-dashboard/blob/master/Dashboard.jpg)
