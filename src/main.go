@@ -23,7 +23,8 @@ func main() {
 
 	listenCh := "portfolio_update"
 	listener.InitDBListener(hub, connInfo, listenCh)
-	go updatedb.UpdateDB(connInfo)
+
+	updatedb.UpdateDB(connInfo)
 
 	http.HandleFunc("/ws", ws.WsPage)
 	http.HandleFunc("/", ws.HomePage)

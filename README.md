@@ -18,6 +18,9 @@ Deploy with docker-compose
 
     ./deploy-docker.sh
 
+Initiate database
+	createdb -h 0.0.0.0 -p 32770 -U dbUser portfolio
+	psql -h 0.0.0.0 -p 32770 -U dbUser -d portfolio -f postgres-init.sql
 
 ### Todos
 * Testing

@@ -1,7 +1,7 @@
 
-create database portfolio;
+# create database portfolio;
 
-\c portfolio;
+# \c portfolio;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

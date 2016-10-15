@@ -2,7 +2,6 @@ package updatedb
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -19,12 +18,11 @@ func updateStock(connInfo string, ticker string) {
 	rand.Seed(time.Now().Unix())
 	for {
 		time.Sleep(time.Duration(rand.Int31n(10000)) * time.Millisecond)
-		selectStmt := fmt.Sprintf("select price from portfolio where ticker='%s';", ticker)
 		var price string
-		err := db.QueryRow(selectStmt).Scan(&price)
+		err := db.QueryRow("select price from portfolio where ticker=$1", ticker).Scan(&price)
 		switch {
 		case err == sql.ErrNoRows:
-			log.Printf("No user with that ID.")
+			log.Fatalln("No user with that ID.")
 		case err != nil:
 			log.Fatal(err)
 			// default:
@@ -32,8 +30,8 @@ func updateStock(connInfo string, ticker string) {
 		}
 
 		priceFloat, err := strconv.ParseFloat(price, 64)
-		updateStmt := fmt.Sprintf("update portfolio set price=%.4f where ticker='%s';", priceFloat+3*rand.NormFloat64(), ticker)
-		db.Exec(updateStmt)
+		// updateStmt := fmt.Sprintf("update portfolio set price=%.4f where ticker='%s';", priceFloat+3*rand.NormFloat64(), ticker)
+		db.Exec("update portfolio set price=$1 where ticker=$2", priceFloat+3*rand.NormFloat64(), ticker)
 	}
 }
 

@@ -4,7 +4,7 @@ websocket-dashboard:
   env_file:
     - ./websocket-dashboard.env
   ports:
-    - "80:8080"
+    - "8080:8080"
   links:
     - postgres:postgres
   # command: websocket-dashboard-linux

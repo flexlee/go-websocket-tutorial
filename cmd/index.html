@@ -10,7 +10,7 @@
 	<meta name="author" content="">
 	<link rel="icon" href="../../favicon.ico">
 
-	<title>Dashboard</title>
+	<title>Dashboard Template for Bootstrap</title>
 
 
 
@@ -109,19 +109,19 @@
 				// item.appendChild(box);
 				// item.parentNode.replaceChild(box, item);
 				$('#GOOG #Quantity').html(jsonData.quantity)
-				$('#GOOG #Price').html(jsonData.price)
+				$('#GOOG #Price').fadeOut(100).html(jsonData.price).fadeIn(100)
 				$('#GOOG #UpdateTime').html(jsonData.update_time)
 			} else if (jsonData.ticker == 'AAPL') {
 				$('#AAPL #Quantity').html(jsonData.quantity)
-				$('#AAPL #Price').html(jsonData.price)
+				$('#AAPL #Price').fadeOut(100).html(jsonData.price).fadeIn(100)
 				$('#AAPL #UpdateTime').html(jsonData.update_time)
 			} else if (jsonData.ticker == 'AMZN') {
 				$('#AMZN #Quantity').html(jsonData.quantity)
-				$('#AMZN #Price').html(jsonData.price)
+				$('#AMZN #Price').fadeOut(100).html(jsonData.price).fadeIn(100)
 				$('#AMZN #UpdateTime').html(jsonData.update_time)
 			} else if (jsonData.ticker == 'FB') {
 				$('#FB #Quantity').html(jsonData.quantity)
-				$('#FB #Price').html(jsonData.price)
+				$('#FB #Price').fadeOut(100).html(jsonData.price).fadeIn(100)
 				$('#FB #UpdateTime').html(jsonData.update_time)
 			}
 		}
