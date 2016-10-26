@@ -1,5 +1,5 @@
 websocket-dashboard:
-  restart: always
+  # restart: always
   build: ./cmd
   env_file:
     - ./websocket-dashboard.env
@@ -7,7 +7,8 @@ websocket-dashboard:
     - "8080:8080"
   links:
     - postgres:postgres
-  # command: websocket-dashboard-linux
+    - redis:redis
+  # command: "/usr/bin/tail -f /dev/null"
 
 postgres:
   restart: always
@@ -16,3 +17,9 @@ postgres:
     - ./postgres.env
   ports:
     - "32770:5432"
+
+redis:
+  restart: always
+  build: ./redis
+  ports:
+    - "32772:6379"

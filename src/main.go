@@ -19,14 +19,18 @@ func main() {
 	fmt.Println(dbAddr)
 	dbPort := os.Getenv("POSTGRES_PORT_5432_TCP_PORT")
 	fmt.Println(dbPort)
+	redisAddr := os.Getenv("REDIS_PORT_6379_TCP_ADDR")
+	redisPort := os.Getenv("REDIS_PORT_6379_TCP_PORT")
+	redisURL := fmt.Sprintf("%s:%s", redisAddr, redisPort)
+	fmt.Println(redisURL)
 
 	connInfo := fmt.Sprintf("host=%s port=%s dbname=portfolio user=dbUser password=something_super_secret_change_in_production sslmode=disable", dbAddr, dbPort)
 
 	// listenCh := "portfolio_update"
 	// listener.InitDBListener(hub, connInfo, listenCh)
 
-	go pubsubredis.SubscribeRedis(hub)
-	updatedb.UpdateDB(connInfo)
+	go pubsubredis.SubscribeRedis(hub, redisURL)
+	updatedb.UpdateDB(connInfo, redisURL)
 
 	http.HandleFunc("/ws", ws.WsPage)
 	http.HandleFunc("/", ws.HomePage)

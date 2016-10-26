@@ -11,9 +11,9 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-func SubscribeRedis(hub *ws.Hub) {
+func SubscribeRedis(hub *ws.Hub, redisURL string) {
 
-	redisClient, err := redis.Dial("tcp", ":32772")
+	redisClient, err := redis.Dial("tcp", redisURL)
 	if err != nil {
 		fmt.Println(err)
 	}

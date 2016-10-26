@@ -19,14 +19,14 @@ type Message struct {
 	Update string  `json:"update_time"`
 }
 
-func updateStock(connInfo string, ticker string) {
+func updateStock(connInfo string, redisURL string, ticker string) {
 	db, err := sql.Open("postgres", connInfo)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	redisClient, err := redis.Dial("tcp", ":32772")
+	redisClient, err := redis.Dial("tcp", redisURL)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -69,11 +69,11 @@ func updateStock(connInfo string, ticker string) {
 	}
 }
 
-func UpdateDB(connInfo string) {
+func UpdateDB(connInfo string, redisURL string) {
 
 	portfolio := []string{"AAPL", "GOOG", "AMZN", "FB"}
 	for _, stock := range portfolio {
-		go updateStock(connInfo, stock)
+		go updateStock(connInfo, redisURL, stock)
 	}
 	// go subscribeRedis()
 }
