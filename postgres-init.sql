@@ -49,6 +49,23 @@ $$ LANGUAGE plpgsql;
 
 create trigger portfolio_notify_trig after insert or update or delete on portfolio for each row execute procedure portfolio_notify_func();
 
+create or replace function update_portfolio_after_stock_price_update()
+returns trigger as 
+$body$
+begin
+	update portfolio
+	set price = (new.price)
+	where ticker = (new.ticker);
+	return new;
+end;
+$body$
+language plpgsql;
+
+create trigger update_portfolio_trig
+after insert on update_stock_price
+for each row
+execute procedure update_portfolio_after_stock_price_update();
+
 
 CREATE OR REPLACE FUNCTION update_change_timestamp()
 RETURNS TRIGGER AS $$

@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/flexlee/websocket-dashboard/src/listener"
+	// "github.com/flexlee/websocket-dashboard/src/listener"
+	"github.com/flexlee/websocket-dashboard/src/pubsubredis"
 	"github.com/flexlee/websocket-dashboard/src/updatedb"
 	"github.com/flexlee/websocket-dashboard/src/ws"
 )
@@ -21,9 +22,10 @@ func main() {
 
 	connInfo := fmt.Sprintf("host=%s port=%s dbname=portfolio user=dbUser password=something_super_secret_change_in_production sslmode=disable", dbAddr, dbPort)
 
-	listenCh := "portfolio_update"
-	listener.InitDBListener(hub, connInfo, listenCh)
+	// listenCh := "portfolio_update"
+	// listener.InitDBListener(hub, connInfo, listenCh)
 
+	go pubsubredis.SubscribeRedis(hub)
 	updatedb.UpdateDB(connInfo)
 
 	http.HandleFunc("/ws", ws.WsPage)

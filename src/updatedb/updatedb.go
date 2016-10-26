@@ -2,11 +2,22 @@ package updatedb
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/garyburd/redigo/redis"
+	_ "github.com/lib/pq"
 )
+
+type Message struct {
+	Ticker string  `json:"ticker"`
+	Price  float64 `json:"price"`
+	Update string  `json:"update_time"`
+}
 
 func updateStock(connInfo string, ticker string) {
 	db, err := sql.Open("postgres", connInfo)
@@ -14,6 +25,12 @@ func updateStock(connInfo string, ticker string) {
 		panic(err)
 	}
 	defer db.Close()
+
+	redisClient, err := redis.Dial("tcp", ":32772")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer redisClient.Close()
 
 	rand.Seed(time.Now().Unix())
 	for {
@@ -30,8 +47,25 @@ func updateStock(connInfo string, ticker string) {
 		}
 
 		priceFloat, err := strconv.ParseFloat(price, 64)
-		// updateStmt := fmt.Sprintf("update portfolio set price=%.4f where ticker='%s';", priceFloat+3*rand.NormFloat64(), ticker)
-		db.Exec("update portfolio set price=$1 where ticker=$2", priceFloat+3*rand.NormFloat64(), ticker)
+		newPrice := priceFloat + 3*rand.NormFloat64()
+		// db.Exec("update portfolio set price=$1 where ticker=$2", newPrice, ticker)
+
+		// db.Exec("insert into update_stock_price (ticker, price) values ($1, $2)", ticker, newPrice)
+		var updateTime string
+		db.QueryRow("insert into update_stock_price (ticker, price) values ($1, $2) returning update_time at time zone 'EST5EDT'", ticker, newPrice).Scan(&updateTime)
+		fmt.Println(updateTime)
+
+		message := Message{
+			Ticker: ticker,
+			Price:  newPrice,
+			Update: updateTime,
+		}
+		output, err := json.MarshalIndent(&message, "", "\t")
+		// message := fmt.Sprintf("%s price updated to %.4f", ticker, newPrice)
+		_, err = redisClient.Do("PUBLISH", "chan1", output)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
 
@@ -41,4 +75,5 @@ func UpdateDB(connInfo string) {
 	for _, stock := range portfolio {
 		go updateStock(connInfo, stock)
 	}
+	// go subscribeRedis()
 }
